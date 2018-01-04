@@ -1,5 +1,7 @@
 package com.kickroot.numbers;
 
+import java.util.Arrays;
+
 public class Main {
 
   ///////////////////////////// Class Attributes \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
@@ -12,15 +14,13 @@ public class Main {
       return;
     }
 
-    for (int i = 0 ; i < args.length ; i++) {
-      String input = args[i];
-
+    Arrays.asList(args).forEach(input -> {
       try {
         System.out.println(NumberParser.parse(input));
       } catch (IllegalArgumentException ex) {
         System.err.println("Error:  " + ex.getMessage());
       }
-    }
+    });
   }
 
   //////////////////////////////// Attributes \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
