@@ -10,7 +10,7 @@ $ mvn clean package
 
 ## Running
 
-The jar itself is executable and has no external dependencies other than the JRE.  For example"
+The jar itself is executable and has no external dependencies other than the JRE.  For example:
 ```
 $ java -jar target/numbers.jar 548.123 1000001 123 123.000 --999,999,999 0 -0 a123 1
 Five hundred forty eight thousand one hundred twenty three
