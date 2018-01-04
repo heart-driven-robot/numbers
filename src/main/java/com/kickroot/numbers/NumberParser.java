@@ -29,9 +29,9 @@ public final class NumberParser {
 
   //
   // We use a list here instead of a straight array because it simplifies access. Instead
-  // of OOB exception we get an empty value for groupings that have no title (hundreds).
+  // of OOB exception we get an empty value for groupings that have no title (like hundreds).
   //
-  // Hundreds don't get a grouping because their text is generated within the Triplet class.
+  // Hundreds don't get a grouping because their place text is generated within the Triplet class.
   //
   private static final List<String> GROUPS = new ArrayList<>(3);
   static {
@@ -128,7 +128,6 @@ public final class NumberParser {
     //
     // Assign each triplet to a place value (millions, thousands, etc)
     //
-    // Place -> Digits
     Map<String, Triplet> map = new LinkedHashMap<>();
     int delta = GROUPS.size() - arrays.size() + 1;
 
@@ -146,7 +145,7 @@ public final class NumberParser {
       result.append(entry.getValue()).append(" ").append(entry.getKey()).append(" ")
     );
 
-    // Capitalize
+    // Minus and capitalization
     String str = (minus ? "minus " : "") + result.toString().trim();
     return str.substring(0, 1).toUpperCase() + str.substring(1);
   }
