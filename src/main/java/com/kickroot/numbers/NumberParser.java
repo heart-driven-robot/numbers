@@ -5,12 +5,30 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-public class NumberParser {
+/**
+ * The meat of the number converter.  NumberParser is responsible for input validation, formatting, and handling
+ * the edge cases the crop up.
+ *
+ * I've tried to make this class as forgiving on input as possible while still drawing the line in a place of sanity.
+ * For example, the following will be accepted:
+ *
+ *  "1 . 000 . 000"
+ *  "1.000.000"
+ *  "--001.000.000" (the minus sign will only count once, they don't cancel each other out)
+ *  "+1,000,000"
+ *
+ *  Note: All whitespace, periods, and commas are ignored, if you pass in a number of the form "100.00", it will parse the same
+ *  as "10000".
+ *
+ *  This class is  designed to work with 32 bit signed integers (meaning that values must be in the range -2^31 to 2^31 - 1),
+ *  but should be easily modifiable to support 64 bit ints.
+ */
+public final class NumberParser {
 
   ///////////////////////////// Class Attributes \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
   //
-  // We use a list here instead of a straight array because it simplifies access, instead
+  // We use a list here instead of a straight array because it simplifies access. Instead
   // of OOB exception we get an empty value for groupings that have no title (hundreds).
   //
   // Hundreds don't get a grouping because their text is generated within the Triplet class.
@@ -57,6 +75,12 @@ public class NumberParser {
     return list;
   }
 
+  /**
+   * The public entry point for number conversion.
+   * @param number The unformatted, unvalidated number string to parse.
+   * @return A well formatted textual representation of the input number.
+   * @throws IllegalArgumentException For any null, extremely poorly formatted, or otherwise unparsable input.
+   */
   public static String parse(String number) throws IllegalArgumentException {
     if (number == null) {
       throw new IllegalArgumentException("Number must not be null");
@@ -70,10 +94,10 @@ public class NumberParser {
     String formattedNumber = strip(number);
 
     //
-    // Note and remove the leading minus sign, if it exists
+    // Note and remove the leading minus sign(s), if any
     //
     final boolean minus = formattedNumber.startsWith("-");
-    formattedNumber = formattedNumber.replaceAll("^-", "");
+    formattedNumber = formattedNumber.replaceAll("^-+", "");
 
     //
     // We strip again after the removal of the minus sign (think '-00)
@@ -115,10 +139,12 @@ public class NumberParser {
 
     final StringBuilder result = new StringBuilder();
 
+    //
+    // Ignore non-value triplets, but otherwise append each triplet along with its place value.
+    //
     map.entrySet().stream().filter(entry -> entry.getValue().hasValue()).forEach(entry ->
       result.append(entry.getValue()).append(" ").append(entry.getKey()).append(" ")
     );
-
 
     // Capitalize
     String str = (minus ? "minus " : "") + result.toString().trim();
@@ -128,6 +154,8 @@ public class NumberParser {
   //////////////////////////////// Attributes \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
   /////////////////////////////// Constructors \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\  
+
+  private NumberParser() {}
 
   ////////////////////////////////// Methods \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 

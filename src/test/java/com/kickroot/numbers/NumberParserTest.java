@@ -50,7 +50,9 @@ class NumberParserTest {
       "-0, 'Minus zero'",
       " - 13, 'Minus thirteen'",
       "-00, 'Minus zero'",
+      "--101, 'Minus one hundred one"
   })
+
   void testEdgeCases(String input, String expected) {
     assertEquals(expected, NumberParser.parse(input));
   }

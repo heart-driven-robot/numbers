@@ -4,6 +4,13 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * The Triplet class is responsible for parsing out the 3 digit triplets that are the basis for number groupings
+ * (think thousands, millions, billions).
+ *
+ * Triplets are ignorant of which grouping they belong to and are only focused on parsing out the 1-3 digit number
+ * passed to it.
+ */
 public class Triplet {
 
   ///////////////////////////// Class Attributes \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
@@ -130,13 +137,24 @@ public class Triplet {
 
   /////////////////////////////// Constructors \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\  
 
+  /**
+   * Create and parse a new Triplet.
+   * @param input The 1-3 digit number string to parse.  Triplets expect properly formatted input!
+   */
   public Triplet(String input) {
+    assert(input.length() > 0 && input.length() < 4);
+
     this.input = input;
     results = convert(input);
   }
 
   ////////////////////////////////// Methods \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
+  /**
+   * Determines whether this triplet has any non-zero value to it.  Triplets that
+   * have zero value are usually ignored in the textual representation but are still
+   * required for determining the placement of other groups.
+   */
   public boolean hasValue() {
     return !input.equals("000");
   }
