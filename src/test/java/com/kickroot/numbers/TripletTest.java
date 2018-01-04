@@ -27,6 +27,6 @@ class TripletTest {
       "30, 'thirty'"
   })
   void testProvidedCases(String input, String expected) {
-    assertEquals(expected, Triplet.convert(input));
+    assertEquals(expected, new Triplet(input).toString());
   }
 }

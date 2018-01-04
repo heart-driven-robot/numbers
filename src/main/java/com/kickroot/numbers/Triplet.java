@@ -59,7 +59,7 @@ public class Triplet {
 
   ////////////////////////////// Class Methods \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
-  public static String convert(String number) {
+  private static String convert(String number) {
 
     number = number.trim().replaceAll("^0+", "");
 
@@ -84,7 +84,7 @@ public class Triplet {
    * @param digits
    * @return
    */
-  protected static String parse(char[] digits) {
+  private static String parse(char[] digits) {
 
     String results = "";
 
@@ -96,7 +96,7 @@ public class Triplet {
     return results;
   }
 
-  protected static String parseTens(char[] digits) {
+  private static String parseTens(char[] digits) {
 
     //
     // Chop off the hundreds if it exists
@@ -118,20 +118,36 @@ public class Triplet {
     } else return parseOnes(digits[0]);
   }
 
-  protected static String parseOnes(char digit) {
+  private static String parseOnes(char digit) {
     return ONES.get("" + digit);
   }
 
   //////////////////////////////// Attributes \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
+  private final String input;
+
+  private final String results;
+
   /////////////////////////////// Constructors \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\  
+
+  public Triplet(String input) {
+    this.input = input;
+    results = convert(input);
+  }
 
   ////////////////////////////////// Methods \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
 
+  public boolean hasValue() {
+    return !input.equals("000");
+  }
 
   //------------------------ Implements:
 
   //------------------------ Overrides: Object
+
+  public String toString() {
+    return results;
+  }
 
   //---------------------------- Abstract Methods -----------------------------
 

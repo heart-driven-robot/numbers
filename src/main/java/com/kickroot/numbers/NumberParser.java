@@ -1,7 +1,3 @@
-/*
- * Copyright (c) 2017 -  SourceClear Inc
- */
-
 package com.kickroot.numbers;
 
 import java.util.ArrayList;
@@ -33,7 +29,7 @@ public class NumberParser {
     return input.trim().replaceAll("^0+", "").replaceAll("[\\s,\\\\.\\\\+]", "");
   }
 
-  protected static List<char[]> buildGroups(String input) {
+  protected static List<String> buildGroups(String input) {
 
     // Pad the input string to a multiple of 3 using leading zeros.  These get stripped
     // later but keeps the logic simpler.
@@ -44,17 +40,17 @@ public class NumberParser {
     // MSB (digits[0] contains the most significant byte)
     char[] digits = input.toCharArray();
 
-    List<char[]> list = new ArrayList<>(input.length() / 3);
-    char[] currentArray = new char[3];
+    List<String> list = new ArrayList<>(input.length() / 3);
+    String current = "";
+
     for (int i = 0 ; i < digits.length ; i++) {
-      int index = i % 3;
-      currentArray[index] = digits[i];
+      current += digits[i];
 
       if (i > 0 && (i+1) %3 == 0) {
-        list.add(currentArray);
-        currentArray = new char[3];
+        list.add(current);
+        current = "";
       } else if (i == digits.length-1) {
-        list.add(currentArray);
+        list.add(current);
       }
     }
 
@@ -64,9 +60,34 @@ public class NumberParser {
   public static String parse(String number) throws IllegalArgumentException {
     if (number == null) {
       throw new IllegalArgumentException("Number must not be null");
+    } else if (number.isEmpty()) {
+      throw new IllegalArgumentException("Number must not be blank");
     }
 
+    //
+    // Remove extraneous formatting and leading zeros
+    //
     String formattedNumber = strip(number);
+
+    //
+    // Note and remove the leading minus sign, if it exists
+    //
+    final boolean minus = formattedNumber.startsWith("-");
+    formattedNumber = formattedNumber.replaceAll("^-", "");
+
+    //
+    // We strip again after the removal of the minus sign (think '-00)
+    //
+    formattedNumber = strip(formattedNumber);
+
+    // Short circuit for zero
+    if (formattedNumber.isEmpty() || formattedNumber.equals("0")) {
+      if (minus) {
+        return "Minus zero";
+      } else {
+        return "Zero";
+      }
+    }
 
     try {
       Integer.parseInt(formattedNumber);
@@ -77,25 +98,31 @@ public class NumberParser {
     //
     // Build out our list of triplets, starting with the most significant place.
     //
-    List<char[]> arrays = buildGroups(formattedNumber);
+    List<String> arrays = buildGroups(formattedNumber);
 
 
     //
     // Assign each triplet to a place value (millions, thousands, etc)
     //
-    Map<String, char[]> map = new LinkedHashMap<>();
+    // Place -> Digits
+    Map<String, Triplet> map = new LinkedHashMap<>();
     int delta = GROUPS.size() - arrays.size() + 1;
 
     for (int i = 0 ; i < arrays.size() ; i++) {
-      map.put(GROUPS.get(GROUPS.size() - i - delta), arrays.get(i));
+      map.put(GROUPS.get(GROUPS.size() - i - delta), new Triplet(arrays.get(i)));
     }
 
 
     final StringBuilder result = new StringBuilder();
 
-    map.forEach((k, v) -> result.append(Triplet.parse(v)).append(" ").append(k).append(" "));
+    map.entrySet().stream().filter(entry -> entry.getValue().hasValue()).forEach(entry ->
+      result.append(entry.getValue()).append(" ").append(entry.getKey()).append(" ")
+    );
 
-    return result.toString();
+
+    // Capitalize
+    String str = (minus ? "minus " : "") + result.toString().trim();
+    return str.substring(0, 1).toUpperCase() + str.substring(1);
   }
 
   //////////////////////////////// Attributes \\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\
